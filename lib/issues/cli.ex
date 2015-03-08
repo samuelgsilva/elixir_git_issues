@@ -23,7 +23,7 @@ defmodule Issues.CLI do
 
 	def parse_args(argsv) do
 		args = OptionParser.parse(argsv, switches: [help: :boolean], aliases: [h: :help])
-		dispatch(args)
+		args |> dispatch |> process
 	end
 
 	defp dispatch({[help: true], _, _}) do
@@ -36,5 +36,16 @@ defmodule Issues.CLI do
 
 	defp dispatch({_, [user, project], _}) do
 		{user, project, @default_count}
+	end
+
+	def process(:help) do
+		IO.puts """
+		Forma de usar: issues <user> <project> [count | #{@default_count}]
+		"""
+		System.halt(0)
+	end
+
+	def process({user, project, _count}) do
+		Issues.GithubIssues.fetch(user, project)
 	end
 end
